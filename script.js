@@ -16,8 +16,50 @@ const findingsList = document.getElementById("findingsList");
 const adviceList = document.getElementById("adviceList");
 const behaviorList = document.getElementById("behaviorList");
 const attackTimeline = document.getElementById("attackTimeline");
+const scrollProgressBar = document.getElementById("scrollProgressBar");
 
 let debounceTimer;
+
+function updateScrollEffects() {
+  const scrollTop = window.scrollY;
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = scrollable > 0 ? (scrollTop / scrollable) * 100 : 0;
+  document.documentElement.style.setProperty("--scroll-y", String(scrollTop));
+
+  if (scrollProgressBar) {
+    scrollProgressBar.style.width = `${Math.min(progress, 100)}%`;
+  }
+}
+
+function setupRevealAnimations() {
+  const revealItems = document.querySelectorAll(".reveal");
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      }
+    },
+    {
+      threshold: 0.16,
+      rootMargin: "0px 0px -40px 0px",
+    },
+  );
+
+  revealItems.forEach((item, index) => {
+    item.style.setProperty("--reveal-delay", `${Math.min(index * 55, 360)}ms`);
+    observer.observe(item);
+  });
+}
+
+function animateButtonPress(button) {
+  button.classList.remove("is-pressed");
+  window.requestAnimationFrame(() => {
+    button.classList.add("is-pressed");
+  });
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -116,7 +158,17 @@ toggleVisibilityButton.addEventListener("click", () => {
   const nextType = passwordInput.type === "password" ? "text" : "password";
   passwordInput.type = nextType;
   toggleVisibilityButton.textContent = nextType === "password" ? "Reveal" : "Hide";
+  animateButtonPress(toggleVisibilityButton);
 });
+
+toggleVisibilityButton.addEventListener("animationend", () => {
+  toggleVisibilityButton.classList.remove("is-pressed");
+});
+
+window.addEventListener("scroll", updateScrollEffects, { passive: true });
+
+setupRevealAnimations();
+updateScrollEffects();
 
 analyzePassword().catch(() => {
   meterLabel.textContent = "Start the Python server";

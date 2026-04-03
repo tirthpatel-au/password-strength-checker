@@ -13,28 +13,45 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="scroll-progress">
+      <div id="scrollProgressBar" class="scroll-progress-bar"></div>
+    </div>
     <div class="noise"></div>
     <div class="orb orb-a"></div>
     <div class="orb orb-b"></div>
 
     <main class="page-shell">
-      <section class="hero-grid">
-        <div class="hero-panel intro-panel">
-          <p class="eyebrow">VaultLens</p>
-          <h1>Advanced password strength intelligence, powered by Python.</h1>
+      <section class="hero-grid reveal">
+        <div class="hero-panel intro-panel reveal">
+          <div class="hero-brand">
+            <a class="brand-lockup" href="#">
+              <span class="brand-mark" aria-hidden="true">
+                <span class="brand-mark-core"></span>
+                <span class="brand-mark-ray brand-mark-ray-a"></span>
+                <span class="brand-mark-ray brand-mark-ray-b"></span>
+              </span>
+              <span class="brand-copy">
+                <strong>Latchlight</strong>
+                <span>Password Security Studio</span>
+              </span>
+            </a>
+            <div class="hero-note">Python powered. Real-time. Human-readable.</div>
+          </div>
+          <p class="eyebrow">Latchlight Studio</p>
+          <h1>Read passwords like an attack analyst, not a checklist.</h1>
           <p class="lede">
-            Live credential analysis for authentication security, brute-force
-            exposure, and real-world user behavior patterns. Type a password and
-            watch the risk profile update instantly.
+            A brighter, editorial password lab for testing authentication
+            security, brute-force exposure, and user behavior patterns in real
+            time. Type a password and watch the profile respond instantly.
           </p>
           <div class="hero-ribbon">
-            <span>Real-time analysis</span>
-            <span>Behavior risk signals</span>
-            <span>Attack timeline</span>
+            <span>Python analysis engine</span>
+            <span>Attack behavior framing</span>
+            <span>Smooth motion system</span>
           </div>
         </div>
 
-        <div class="hero-panel pulse-panel">
+        <div class="hero-panel pulse-panel reveal">
           <p class="eyebrow">Security Pulse</p>
           <div class="ring-wrap">
             <div class="ring-shell">
@@ -61,12 +78,12 @@
         </div>
       </section>
 
-      <section class="main-grid">
-        <section class="command-panel">
+      <section class="main-grid reveal">
+        <section class="command-panel reveal">
           <div class="panel-head">
             <div>
               <p class="eyebrow">Live Checker</p>
-              <h2>Inspect a password</h2>
+              <h2>Inspect a password under pressure</h2>
             </div>
             <button id="toggleVisibility" class="glass-button" type="button">
               Reveal
@@ -114,9 +131,9 @@
           </div>
         </section>
 
-        <aside class="story-panel">
-          <div class="story-card">
-            <p class="eyebrow">Attack Reality</p>
+        <aside class="story-panel reveal">
+          <div class="story-card reveal">
+            <p class="eyebrow">Field Notes</p>
             <h3>Why passwords fail in practice</h3>
             <p>
               Attackers do not guess randomly. They start with leaked habits:
@@ -124,14 +141,14 @@
               substitutions.
             </p>
           </div>
-          <div class="story-card contrast-card">
+          <div class="story-card contrast-card reveal">
             <div>
               <span class="mini-tag danger">Weak</span>
               <code>Summer2024!</code>
             </div>
             <p>Season plus year plus symbol is one of the first patterns tested.</p>
           </div>
-          <div class="story-card contrast-card">
+          <div class="story-card contrast-card reveal">
             <div>
               <span class="mini-tag safe">Stronger</span>
               <code>harbor-lime-velvet-47-lantern</code>
@@ -141,8 +158,8 @@
         </aside>
       </section>
 
-      <section class="insight-grid">
-        <article class="data-panel">
+      <section class="insight-grid reveal">
+        <article class="data-panel reveal">
           <div class="panel-head compact">
             <div>
               <p class="eyebrow">Findings</p>
@@ -152,7 +169,7 @@
           <ul id="findingsList" class="signal-list"></ul>
         </article>
 
-        <article class="data-panel">
+        <article class="data-panel reveal">
           <div class="panel-head compact">
             <div>
               <p class="eyebrow">Guidance</p>
@@ -162,7 +179,7 @@
           <ul id="adviceList" class="signal-list"></ul>
         </article>
 
-        <article class="data-panel">
+        <article class="data-panel reveal">
           <div class="panel-head compact">
             <div>
               <p class="eyebrow">Behavior Risk</p>
@@ -173,7 +190,7 @@
         </article>
       </section>
 
-      <section class="timeline-panel">
+      <section class="timeline-panel reveal">
         <div class="panel-head compact">
           <div>
             <p class="eyebrow">Attack Window</p>
