@@ -33,18 +33,26 @@ This project analyzes password quality instantly and explains why a password is 
 
 - Python 3.10 or newer recommended
 
+## Clone The Repository
+
+```bash
+git clone https://github.com/tirthpatel-au/password-strength-checker.git
+cd password-strength-checker
+```
+
 ## How To Run
 
 1. Install Python from [python.org](https://www.python.org/downloads/)
 2. During installation, enable `Add Python to PATH`
-3. Open a terminal in this project folder
-4. Run:
+3. Clone this repository to your local device
+4. Open a terminal in the project folder
+5. Run:
 
 ```bash
 python app.py
 ```
 
-5. Open your browser at:
+6. Open your browser at:
 
 ```text
 http://127.0.0.1:8000
