@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VaultLens | Password Strength Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+
+    <main class="page-shell">
+      <section class="hero-grid">
+        <div class="hero-panel intro-panel">
+          <p class="eyebrow">VaultLens</p>
+          <h1>Advanced password strength intelligence, powered by Python.</h1>
+          <p class="lede">
+            Live credential analysis for authentication security, brute-force
+            exposure, and real-world user behavior patterns. Type a password and
+            watch the risk profile update instantly.
+          </p>
+          <div class="hero-ribbon">
+            <span>Real-time analysis</span>
+            <span>Behavior risk signals</span>
+            <span>Attack timeline</span>
+          </div>
+        </div>
+
+        <div class="hero-panel pulse-panel">
+          <p class="eyebrow">Security Pulse</p>
+          <div class="ring-wrap">
+            <div class="ring-shell">
+              <div id="scoreRing" class="ring-core critical">
+                <strong id="ringScore">0</strong>
+                <span>score</span>
+              </div>
+            </div>
+            <div class="ring-copy">
+              <h2 id="headline">Ready for inspection</h2>
+              <p id="rating">No password entered</p>
+            </div>
+          </div>
+          <div class="hero-metrics">
+            <article>
+              <span>Entropy</span>
+              <strong id="entropyBits">0 bits</strong>
+            </article>
+            <article>
+              <span>Pattern load</span>
+              <strong id="patternLoad">None</strong>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="main-grid">
+        <section class="command-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Live Checker</p>
+              <h2>Inspect a password</h2>
+            </div>
+            <button id="toggleVisibility" class="glass-button" type="button">
+              Reveal
+            </button>
+          </div>
+
+          <label class="field-label" for="passwordInput">Password input</label>
+          <div class="input-frame">
+            <input
+              id="passwordInput"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Try something weak, then improve it..."
+            />
+          </div>
+
+          <div class="meter-block">
+            <div class="meter-track">
+              <div id="meterFill" class="meter-fill critical"></div>
+            </div>
+            <div class="meter-meta">
+              <span id="meterLabel">System idle</span>
+              <strong id="meterScore">0 / 100</strong>
+            </div>
+          </div>
+
+          <div class="telemetry-grid">
+            <article class="telemetry-card">
+              <span class="telemetry-label">Length</span>
+              <strong id="metricLength">0</strong>
+            </article>
+            <article class="telemetry-card">
+              <span class="telemetry-label">Unique chars</span>
+              <strong id="metricUnique">0</strong>
+            </article>
+            <article class="telemetry-card">
+              <span class="telemetry-label">Memory style</span>
+              <strong id="memoryStyle">Unknown</strong>
+            </article>
+            <article class="telemetry-card">
+              <span class="telemetry-label">Python API</span>
+              <strong>Active</strong>
+            </article>
+          </div>
+        </section>
+
+        <aside class="story-panel">
+          <div class="story-card">
+            <p class="eyebrow">Attack Reality</p>
+            <h3>Why passwords fail in practice</h3>
+            <p>
+              Attackers do not guess randomly. They start with leaked habits:
+              seasons, names, years, keyboard paths, reused fragments, and easy
+              substitutions.
+            </p>
+          </div>
+          <div class="story-card contrast-card">
+            <div>
+              <span class="mini-tag danger">Weak</span>
+              <code>Summer2024!</code>
+            </div>
+            <p>Season plus year plus symbol is one of the first patterns tested.</p>
+          </div>
+          <div class="story-card contrast-card">
+            <div>
+              <span class="mini-tag safe">Stronger</span>
+              <code>harbor-lime-velvet-47-lantern</code>
+            </div>
+            <p>Longer, unusual, memorable, and far more resistant to common attacks.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="insight-grid">
+        <article class="data-panel">
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">Findings</p>
+              <h2>Security observations</h2>
+            </div>
+          </div>
+          <ul id="findingsList" class="signal-list"></ul>
+        </article>
+
+        <article class="data-panel">
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">Guidance</p>
+              <h2>How to improve it</h2>
+            </div>
+          </div>
+          <ul id="adviceList" class="signal-list"></ul>
+        </article>
+
+        <article class="data-panel">
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">Behavior Risk</p>
+              <h2>User habit signals</h2>
+            </div>
+          </div>
+          <div id="behaviorList" class="behavior-list"></div>
+        </article>
+      </section>
+
+      <section class="timeline-panel">
+        <div class="panel-head compact">
+          <div>
+            <p class="eyebrow">Attack Window</p>
+            <h2>Estimated time-to-crack by scenario</h2>
+          </div>
+        </div>
+        <div id="attackTimeline" class="timeline-grid"></div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
