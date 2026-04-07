@@ -21,35 +21,85 @@
     <div class="orb orb-b"></div>
 
     <main class="page-shell">
+      <header class="site-header">
+        <a class="brand-lockup" href="#">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="brand-mark-core"></span>
+            <span class="brand-mark-ray brand-mark-ray-a"></span>
+            <span class="brand-mark-ray brand-mark-ray-b"></span>
+          </span>
+          <span class="brand-copy">
+            <strong>Latchlight</strong>
+            <span>Password Security Studio</span>
+          </span>
+        </a>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="about.html">About us</a>
+        </nav>
+      </header>
+
       <section class="hero-grid reveal">
-        <div class="hero-panel intro-panel reveal">
-          <div class="hero-brand">
-            <a class="brand-lockup" href="#">
-              <span class="brand-mark" aria-hidden="true">
-                <span class="brand-mark-core"></span>
-                <span class="brand-mark-ray brand-mark-ray-a"></span>
-                <span class="brand-mark-ray brand-mark-ray-b"></span>
-              </span>
-              <span class="brand-copy">
-                <strong>Latchlight</strong>
-                <span>Password Security Studio</span>
-              </span>
-            </a>
-            <div class="hero-note">Python powered. Real-time. Human-readable.</div>
+        <section class="command-panel reveal">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Live Checker</p>
+              <h1>Test your password strength.</h1>
+              <p class="lede">
+                Type a password and get a real-time read on exposure, patterns,
+                and practical attack risk.
+              </p>
+            </div>
+            <button id="toggleVisibility" class="glass-button" type="button">
+              Reveal
+            </button>
           </div>
-          <p class="eyebrow">Latchlight Studio</p>
-          <h1>Read passwords like an attack analyst, not a checklist.</h1>
-          <p class="lede">
-            A brighter, editorial password lab for testing authentication
-            security, brute-force exposure, and user behavior patterns in real
-            time. Type a password and watch the profile respond instantly.
-          </p>
-          <div class="hero-ribbon">
-            <span>Python analysis engine</span>
-            <span>Attack behavior framing</span>
-            <span>Smooth motion system</span>
+
+          <label class="field-label" for="passwordInput">Password input</label>
+          <div class="input-frame">
+            <input
+              id="passwordInput"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Try something weak, then improve it..."
+            />
           </div>
-        </div>
+
+          <div class="meter-block">
+            <div class="meter-track">
+              <div id="meterFill" class="meter-fill critical"></div>
+            </div>
+            <div class="meter-meta">
+              <span id="meterLabel">System idle</span>
+              <strong id="meterScore">0 / 100</strong>
+            </div>
+          </div>
+
+          <div class="crack-time-callout" aria-live="polite">
+            <span>Estimated crack time</span>
+            <strong id="primaryCrackTime">Instant</strong>
+            <p id="primaryCrackLabel">Offline hash cracking</p>
+          </div>
+
+          <div class="telemetry-grid">
+            <article class="telemetry-card">
+              <span class="telemetry-label">Length</span>
+              <strong id="metricLength">0</strong>
+            </article>
+            <article class="telemetry-card">
+              <span class="telemetry-label">Unique chars</span>
+              <strong id="metricUnique">0</strong>
+            </article>
+            <article class="telemetry-card">
+              <span class="telemetry-label">Memory style</span>
+              <strong id="memoryStyle">Unknown</strong>
+            </article>
+            <article class="telemetry-card">
+              <span class="telemetry-label">Python API</span>
+              <strong>Active</strong>
+            </article>
+          </div>
+        </section>
 
         <div class="hero-panel pulse-panel reveal">
           <p class="eyebrow">Security Pulse</p>
@@ -78,58 +128,65 @@
         </div>
       </section>
 
+      <section id="generator" class="generator-panel reveal">
+        <div class="panel-head compact">
+          <div>
+            <p class="eyebrow">Password Generator</p>
+            <h2>Generate a strong passphrase</h2>
+          </div>
+        </div>
+
+        <div class="generator-grid">
+          <div>
+            <label class="field-label" for="wordCount">Number of words</label>
+            <div class="input-frame compact-input">
+              <input id="wordCount" type="number" min="3" max="10" value="4" />
+            </div>
+          </div>
+
+          <div>
+            <label class="field-label" for="separatorType">Separator between words</label>
+            <select id="separatorType" class="select-control">
+              <option value="-">Dash (-)</option>
+              <option value="*">Asterisk (*)</option>
+              <option value=" ">Space</option>
+              <option value="number">Number</option>
+              <option value=",">Comma (,)</option>
+              <option value="_">Underscore (_)</option>
+              <option value="mix">Mix</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="generated-password-box" aria-live="polite">
+          <span>Generated password</span>
+          <code id="generatedPassword">Choose options and generate a password.</code>
+        </div>
+
+        <div class="generator-actions">
+          <button id="generatePassword" class="glass-button" type="button">
+            Generate password
+          </button>
+          <button id="copyGeneratedPassword" class="secondary-button" type="button">
+            Copy password
+          </button>
+        </div>
+      </section>
+
       <section class="main-grid reveal">
-        <section class="command-panel reveal">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Live Checker</p>
-              <h2>Inspect a password under pressure</h2>
-            </div>
-            <button id="toggleVisibility" class="glass-button" type="button">
-              Reveal
-            </button>
+        <div class="hero-panel intro-panel reveal">
+          <p class="eyebrow">Latchlight Studio</p>
+          <h2>Read passwords like an attack analyst, not a checklist.</h2>
+          <p class="lede">
+            A brighter password lab for testing authentication security,
+            brute-force exposure, and user behavior patterns in real time.
+          </p>
+          <div class="hero-ribbon">
+            <span>Python analysis engine</span>
+            <span>Attack behavior framing</span>
+            <span>Smooth motion system</span>
           </div>
-
-          <label class="field-label" for="passwordInput">Password input</label>
-          <div class="input-frame">
-            <input
-              id="passwordInput"
-              type="password"
-              autocomplete="off"
-              spellcheck="false"
-              placeholder="Try something weak, then improve it..."
-            />
-          </div>
-
-          <div class="meter-block">
-            <div class="meter-track">
-              <div id="meterFill" class="meter-fill critical"></div>
-            </div>
-            <div class="meter-meta">
-              <span id="meterLabel">System idle</span>
-              <strong id="meterScore">0 / 100</strong>
-            </div>
-          </div>
-
-          <div class="telemetry-grid">
-            <article class="telemetry-card">
-              <span class="telemetry-label">Length</span>
-              <strong id="metricLength">0</strong>
-            </article>
-            <article class="telemetry-card">
-              <span class="telemetry-label">Unique chars</span>
-              <strong id="metricUnique">0</strong>
-            </article>
-            <article class="telemetry-card">
-              <span class="telemetry-label">Memory style</span>
-              <strong id="memoryStyle">Unknown</strong>
-            </article>
-            <article class="telemetry-card">
-              <span class="telemetry-label">Python API</span>
-              <strong>Active</strong>
-            </article>
-          </div>
-        </section>
+        </div>
 
         <aside class="story-panel reveal">
           <div class="story-card reveal">
@@ -156,6 +213,33 @@
             <p>Longer, unusual, memorable, and far more resistant to common attacks.</p>
           </div>
         </aside>
+      </section>
+
+      <section class="tips-panel reveal">
+        <div class="panel-head compact">
+          <div>
+            <p class="eyebrow">Strong Password Tips</p>
+            <h2>How to make passwords harder to crack</h2>
+          </div>
+        </div>
+        <div class="tips-grid">
+          <article class="tip-item">
+            <strong>Use more words</strong>
+            <p>Four or more unrelated words are easier to remember and harder to brute force.</p>
+          </article>
+          <article class="tip-item">
+            <strong>Avoid personal clues</strong>
+            <p>Do not use names, birthdays, school names, sports teams, or current years.</p>
+          </article>
+          <article class="tip-item">
+            <strong>Keep each password unique</strong>
+            <p>Use a different password for every account so one leak cannot unlock everything.</p>
+          </article>
+          <article class="tip-item">
+            <strong>Store it safely</strong>
+            <p>Use a password manager and turn on MFA for email, banking, and important accounts.</p>
+          </article>
+        </div>
       </section>
 
       <section class="insight-grid reveal">
@@ -199,6 +283,11 @@
         </div>
         <div id="attackTimeline" class="timeline-grid"></div>
       </section>
+
+      <footer class="site-footer">
+        <span>&copy; Tirth Patel</span>
+        <a href="about.html">About us</a>
+      </footer>
     </main>
 
     <script src="script.js"></script>

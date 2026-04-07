@@ -8,6 +8,7 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).parent
@@ -55,6 +56,11 @@ ATTACK_SCENARIOS = (
     AttackScenario("Offline hash cracking", 10_000_000_000),
 )
 
+SECONDS_PER_MINUTE = 60
+SECONDS_PER_HOUR = SECONDS_PER_MINUTE * 60
+SECONDS_PER_DAY = SECONDS_PER_HOUR * 24
+SECONDS_PER_YEAR = SECONDS_PER_DAY * 365
+
 
 def estimate_charset(password: str) -> int:
     charset = 0
@@ -87,19 +93,64 @@ def format_duration(seconds: float) -> str:
     if seconds <= 0 or not math.isfinite(seconds):
         return "Instant"
 
+    if seconds < 1:
+        return "Less than a second"
+
+    if seconds >= SECONDS_PER_YEAR:
+        return format_years(seconds / SECONDS_PER_YEAR)
+
     units = (
-        ("centuries", 60 * 60 * 24 * 365 * 100),
-        ("years", 60 * 60 * 24 * 365),
-        ("days", 60 * 60 * 24),
-        ("hours", 60 * 60),
-        ("minutes", 60),
-        ("seconds", 1),
+        ("day", "days", SECONDS_PER_DAY),
+        ("hour", "hours", SECONDS_PER_HOUR),
+        ("minute", "minutes", SECONDS_PER_MINUTE),
+        ("second", "seconds", 1),
     )
-    for label, size in units:
+    for singular_label, plural_label, size in units:
         if seconds >= size:
-            value = round(seconds / size, 1)
-            return f"{value} {label}"
+            value = seconds / size
+            display_value = round(value, 1) if value < 10 else round(value)
+            label = singular_label if display_value == 1 else plural_label
+            return f"{display_value:g} {label}"
+
     return "Less than a second"
+
+
+def format_years(years: float) -> str:
+    large_units = (
+        (1_000_000_000_000, "trillion years"),
+        (1_000_000_000, "billion years"),
+        (1_000_000, "million years"),
+    )
+    for size, label in large_units:
+        if years >= size:
+            value = years / size
+            display_value = round(value, 1) if value < 10 else round(value)
+            return f"Over {display_value:g} {label}"
+
+    if years >= 100:
+        centuries = years / 100
+        display_value = round(centuries, 1) if centuries < 10 else round(centuries)
+        label = "century" if display_value == 1 else "centuries"
+        return f"{display_value:g} {label}"
+
+    display_value = round(years, 1) if years < 10 else round(years)
+    label = "year" if display_value == 1 else "years"
+    return f"{display_value:g} {label}"
+
+
+def format_crack_duration(entropy_bits: int, guesses_per_second: float) -> str:
+    if entropy_bits <= 0:
+        return "Instant"
+
+    log10_seconds = entropy_bits * math.log10(2) - math.log10(guesses_per_second)
+    if log10_seconds < 6:
+        return format_duration((2**entropy_bits) / guesses_per_second)
+
+    log10_years = log10_seconds - math.log10(SECONDS_PER_YEAR)
+    if log10_years >= 0:
+        return format_years(10**min(log10_years, 308))
+
+    return format_duration(10**log10_seconds)
 
 
 def meter_state(score: int) -> str:
@@ -271,11 +322,10 @@ def analyze_password(password: str) -> dict[str, Any]:
     score = max(0, min(100, round(score)))
     entropy_bits = max(0, round(raw_entropy - max(0, 60 - score) * 0.45))
 
-    combinations = max(1.0, 2 ** min(entropy_bits, 62))
     attack_windows = [
         {
             "label": scenario.label,
-            "time": format_duration(combinations / scenario.guesses_per_second),
+            "time": format_crack_duration(entropy_bits, scenario.guesses_per_second),
         }
         for scenario in ATTACK_SCENARIOS
     ]
@@ -329,13 +379,18 @@ def analyze_password(password: str) -> dict[str, Any]:
 
 class PasswordHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
-        if self.path in ("/", "/index.html"):
+        path = urlparse(self.path).path
+
+        if path in ("/", "/index.html"):
             self._serve_file("index.html", "text/html; charset=utf-8")
             return
-        if self.path == "/styles.css":
+        if path in ("/about", "/about.html"):
+            self._serve_file("about.html", "text/html; charset=utf-8")
+            return
+        if path == "/styles.css":
             self._serve_file("styles.css", "text/css; charset=utf-8")
             return
-        if self.path == "/script.js":
+        if path == "/script.js":
             self._serve_file("script.js", "application/javascript; charset=utf-8")
             return
         self.send_error(HTTPStatus.NOT_FOUND, "Not found")

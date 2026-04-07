@@ -9,6 +9,8 @@ const headline = document.getElementById("headline");
 const rating = document.getElementById("rating");
 const entropyBits = document.getElementById("entropyBits");
 const patternLoad = document.getElementById("patternLoad");
+const primaryCrackTime = document.getElementById("primaryCrackTime");
+const primaryCrackLabel = document.getElementById("primaryCrackLabel");
 const metricLength = document.getElementById("metricLength");
 const metricUnique = document.getElementById("metricUnique");
 const memoryStyle = document.getElementById("memoryStyle");
@@ -17,6 +19,61 @@ const adviceList = document.getElementById("adviceList");
 const behaviorList = document.getElementById("behaviorList");
 const attackTimeline = document.getElementById("attackTimeline");
 const scrollProgressBar = document.getElementById("scrollProgressBar");
+const wordCountInput = document.getElementById("wordCount");
+const separatorType = document.getElementById("separatorType");
+const generatedPassword = document.getElementById("generatedPassword");
+const generatePasswordButton = document.getElementById("generatePassword");
+const copyGeneratedPasswordButton = document.getElementById("copyGeneratedPassword");
+
+const WORD_BANK = [
+  "anchor",
+  "bamboo",
+  "canyon",
+  "drift",
+  "ember",
+  "falcon",
+  "harbor",
+  "ivy",
+  "jungle",
+  "kelp",
+  "lantern",
+  "meadow",
+  "nebula",
+  "onyx",
+  "pepper",
+  "quartz",
+  "river",
+  "saffron",
+  "thunder",
+  "umbra",
+  "velvet",
+  "willow",
+  "xenon",
+  "yonder",
+  "zephyr",
+  "atlas",
+  "breeze",
+  "copper",
+  "dawn",
+  "echo",
+  "frost",
+  "grove",
+  "hazel",
+  "iris",
+  "juniper",
+  "kiwi",
+  "lotus",
+  "mango",
+  "nova",
+  "opal",
+  "prairie",
+  "raven",
+  "signal",
+  "timber",
+  "violet",
+  "walnut",
+];
+const MIX_SEPARATORS = ["-", "_", "*", ",", " ", "number"];
 
 let debounceTimer;
 
@@ -61,6 +118,20 @@ function animateButtonPress(button) {
   });
 }
 
+function randomInt(max) {
+  if (!window.crypto) {
+    return Math.floor(Math.random() * max);
+  }
+
+  const values = new Uint32Array(1);
+  window.crypto.getRandomValues(values);
+  return values[0] % max;
+}
+
+function pickRandom(items) {
+  return items[randomInt(items.length)];
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -98,6 +169,95 @@ function renderTimeline(items) {
     .join("");
 }
 
+function updatePrimaryCrackTime(items) {
+  const offlineEstimate = items.find((item) => item.label === "Offline hash cracking");
+  const estimate = offlineEstimate || items.at(-1);
+
+  if (!estimate) {
+    primaryCrackTime.textContent = "Instant";
+    primaryCrackLabel.textContent = "Offline hash cracking";
+    return;
+  }
+
+  primaryCrackTime.textContent = estimate.time;
+  primaryCrackLabel.textContent = estimate.label;
+}
+
+function getSeparator() {
+  const selected = separatorType.value;
+
+  if (selected === "number") {
+    return String(randomInt(10));
+  }
+
+  if (selected === "mix") {
+    const mixedSeparator = pickRandom(MIX_SEPARATORS);
+    return mixedSeparator === "number" ? String(randomInt(10)) : mixedSeparator;
+  }
+
+  return selected;
+}
+
+function generatePassphrase() {
+  const requestedCount = Number.parseInt(wordCountInput.value, 10);
+  const wordCount = Math.min(Math.max(requestedCount || 4, 3), 10);
+  wordCountInput.value = String(wordCount);
+  const words = [];
+
+  while (words.length < wordCount) {
+    const word = pickRandom(WORD_BANK);
+    if (!words.includes(word)) {
+      words.push(word);
+    }
+  }
+
+  const password = words
+    .map((word, index) => (index % 2 === 0 ? word : `${word[0].toUpperCase()}${word.slice(1)}`))
+    .reduce((parts, word, index) => {
+      if (index > 0) {
+        parts.push(getSeparator());
+      }
+      parts.push(word);
+      return parts;
+    }, [])
+    .join("");
+
+  generatedPassword.textContent = password;
+  copyGeneratedPasswordButton.textContent = "Copy password";
+  passwordInput.value = password;
+  analyzePassword().catch(() => {
+    meterLabel.textContent = "Python service unavailable";
+    rating.textContent = "Check the local server";
+  });
+}
+
+async function copyGeneratedPassword() {
+  const password = generatedPassword.textContent.trim();
+  if (!password || password.startsWith("Choose options")) {
+    copyGeneratedPasswordButton.textContent = "Generate first";
+    return;
+  }
+
+  try {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(password);
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = password;
+      textArea.setAttribute("readonly", "");
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+    copyGeneratedPasswordButton.textContent = "Copied";
+  } catch {
+    copyGeneratedPasswordButton.textContent = "Copy unavailable";
+  }
+}
+
 function setStateClasses(state) {
   const states = ["critical", "weak", "moderate", "strong", "excellent"];
   meterFill.classList.remove(...states);
@@ -122,6 +282,7 @@ function applyResult(result) {
   renderList(findingsList, result.findings);
   renderList(adviceList, result.advice);
   renderBehavior(result.behavior_flags);
+  updatePrimaryCrackTime(result.attack_windows);
   renderTimeline(result.attack_windows);
 }
 
@@ -163,6 +324,24 @@ toggleVisibilityButton.addEventListener("click", () => {
 
 toggleVisibilityButton.addEventListener("animationend", () => {
   toggleVisibilityButton.classList.remove("is-pressed");
+});
+
+generatePasswordButton.addEventListener("click", () => {
+  generatePassphrase();
+  animateButtonPress(generatePasswordButton);
+});
+
+copyGeneratedPasswordButton.addEventListener("click", () => {
+  copyGeneratedPassword();
+  animateButtonPress(copyGeneratedPasswordButton);
+});
+
+generatePasswordButton.addEventListener("animationend", () => {
+  generatePasswordButton.classList.remove("is-pressed");
+});
+
+copyGeneratedPasswordButton.addEventListener("animationend", () => {
+  copyGeneratedPasswordButton.classList.remove("is-pressed");
 });
 
 window.addEventListener("scroll", updateScrollEffects, { passive: true });
