@@ -2,6 +2,10 @@
 
 A Python-powered password strength checker with a high-impact UI focused on authentication security, brute-force risk, and real-time user guidance.
 
+## Demo
+
+[Open the local demo](http://127.0.0.1:8000) after starting the app with `python app.py`.
+
 ## Overview
 
 This project analyzes password quality instantly and explains why a password is weak, moderate, or strong. It goes beyond a simple score by surfacing:
