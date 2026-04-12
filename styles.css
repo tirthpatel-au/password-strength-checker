@@ -627,6 +627,50 @@ h3 {
   margin: 8px 0 0;
 }
 
+.breach-callout {
+  margin: 0 0 24px;
+  padding: 18px 16px;
+  border: 1px solid rgba(16, 24, 32, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.breach-callout span,
+.breach-callout p {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.breach-callout span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.breach-callout strong {
+  display: block;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.breach-callout p {
+  margin: 8px 0 0;
+}
+
+.breach-callout.is-breached {
+  border-color: rgba(201, 79, 79, 0.35);
+  background: rgba(201, 79, 79, 0.08);
+}
+
+.breach-callout.is-clear {
+  border-color: rgba(8, 127, 140, 0.3);
+  background: rgba(8, 127, 140, 0.08);
+}
+
+.breach-callout.is-unavailable {
+  border-color: rgba(217, 130, 43, 0.32);
+  background: rgba(217, 130, 43, 0.08);
+}
+
 .telemetry-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

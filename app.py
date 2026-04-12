@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import re
@@ -8,10 +9,13 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
+from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).parent
+BREACH_CACHE: dict[str, int] = {}
 COMMON_PATTERNS = {
     "password",
     "admin",
@@ -60,6 +64,8 @@ SECONDS_PER_MINUTE = 60
 SECONDS_PER_HOUR = SECONDS_PER_MINUTE * 60
 SECONDS_PER_DAY = SECONDS_PER_HOUR * 24
 SECONDS_PER_YEAR = SECONDS_PER_DAY * 365
+HIBP_RANGE_API = "https://api.pwnedpasswords.com/range/"
+HIBP_USER_AGENT = "Latchlight Password Strength Checker"
 
 
 def estimate_charset(password: str) -> int:
@@ -153,6 +159,76 @@ def format_crack_duration(entropy_bits: int, guesses_per_second: float) -> str:
     return format_duration(10**log10_seconds)
 
 
+def lookup_breach_count(password: str) -> int | None:
+    sha1_hash = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
+    cached_count = BREACH_CACHE.get(sha1_hash)
+    if cached_count is not None:
+        return cached_count
+
+    prefix = sha1_hash[:5]
+    suffix = sha1_hash[5:]
+    request = Request(
+        f"{HIBP_RANGE_API}{prefix}",
+        headers={
+            "Add-Padding": "true",
+            "User-Agent": HIBP_USER_AGENT,
+        },
+    )
+
+    try:
+        with urlopen(request, timeout=4) as response:
+            payload = response.read().decode("utf-8")
+    except (HTTPError, URLError, TimeoutError, OSError):
+        return None
+
+    count = 0
+    for line in payload.splitlines():
+        hash_suffix, _, hash_count = line.partition(":")
+        if hash_suffix == suffix:
+            try:
+                count = int(hash_count)
+            except ValueError:
+                count = 0
+            break
+
+    BREACH_CACHE[sha1_hash] = count
+    return count
+
+
+def breach_check_payload(password: str) -> dict[str, Any]:
+    if not password:
+        return {
+            "status": "idle",
+            "count": 0,
+            "headline": "Not checked yet",
+            "detail": "Enter a password to check if it has appeared in known breaches.",
+        }
+
+    breach_count = lookup_breach_count(password)
+    if breach_count is None:
+        return {
+            "status": "unavailable",
+            "count": 0,
+            "headline": "Breach check unavailable",
+            "detail": "The breach database could not be reached right now. Try again in a moment.",
+        }
+
+    if breach_count > 0:
+        return {
+            "status": "breached",
+            "count": breach_count,
+            "headline": "Previously breached password",
+            "detail": f"This password has appeared in breach data {breach_count:,} times. Do not use it.",
+        }
+
+    return {
+        "status": "clear",
+        "count": 0,
+        "headline": "No breach found",
+        "detail": "This password was not found in the breach data checked by the service.",
+    }
+
+
 def meter_state(score: int) -> str:
     if score >= 85:
         return "excellent"
@@ -191,6 +267,7 @@ def analyze_password(password: str) -> dict[str, Any]:
                     "detail": "Even a strong-looking password becomes risky if it is reused across sites.",
                 }
             ],
+            "breach_check": breach_check_payload(password),
             "attack_windows": [
                 {"label": scenario.label, "time": "Instant"}
                 for scenario in ATTACK_SCENARIOS
@@ -201,6 +278,7 @@ def analyze_password(password: str) -> dict[str, Any]:
     findings: list[str] = []
     advice: list[str] = []
     behavior_flags: list[dict[str, str]] = []
+    breach_check = breach_check_payload(password)
 
     length = len(password)
     unique_chars = len(set(password))
@@ -319,6 +397,13 @@ def analyze_password(password: str) -> dict[str, Any]:
     advice.append("Never reuse this password on another account.")
     advice.append("Pair strong passwords with MFA for high-value accounts.")
 
+    if breach_check["status"] == "breached":
+        score = min(score, 18)
+        findings.insert(0, "This password has appeared in known breach data before.")
+        advice.insert(0, "Replace breached passwords immediately and never reuse them on any account.")
+    elif breach_check["status"] == "unavailable":
+        findings.insert(0, "Breach status could not be verified right now.")
+
     score = max(0, min(100, round(score)))
     entropy_bits = max(0, round(raw_entropy - max(0, 60 - score) * 0.45))
 
@@ -373,6 +458,7 @@ def analyze_password(password: str) -> dict[str, Any]:
                 "detail": "The checker did not spot a dominant user-behavior pattern, but uniqueness still matters.",
             }
         ],
+        "breach_check": breach_check,
         "attack_windows": attack_windows,
     }
 

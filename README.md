@@ -4,7 +4,9 @@ A Python-powered password strength checker with a high-impact UI focused on auth
 
 ## Demo
 
-[Open the local demo](http://127.0.0.1:8000) after starting the app with `python app.py`.
+[Open the live demo](https://tirthpatel-au.github.io/password-strength-checker/)
+
+For local development, run `python app.py` and open `http://127.0.0.1:8000`.
 
 ## Overview
 
